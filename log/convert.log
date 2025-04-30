@@ -1,0 +1,7 @@
+2025-04-18 15:40:35 - 🟢 Virtual environment found. Using : /home/f9990990/essencepy/rt/python/bin/python3
+2025-04-18 15:40:35 - ❌ Error : Notebook 'demo-yaml.ipynb' is not found in '/home/f9990990/essencepy/src'.
+2025-04-18 15:43:05 - 🟢 Virtual environment found. Using : /home/f9990990/essencepy/rt/python/bin/python3
+2025-04-18 15:43:05 - Converting notebook : demo-yaml.ipynb
+2025-04-18 15:43:06 - ✅ Success : demo-yaml.ipynb
+2025-04-18 15:43:06 - 🎉 Converting is finished.
+2025-04-18 15:43:06 - --- END OF PROCESS ---
