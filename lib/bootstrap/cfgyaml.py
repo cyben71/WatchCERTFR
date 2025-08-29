@@ -1,4 +1,6 @@
-import os
+__version__ = "1.0.1"
+
+import os, sys
 import yaml
 import re
 from typing import Dict, List, Any, Optional
@@ -10,8 +12,10 @@ class ConfigYaml:
     Config files used by this class: 
     - conf/application.yaml : contains properties used by application
     """
+    alias = "cfgyaml"
 
     def __init__(self, app_home: str):
+    #def __init__(self, conf_dir: Path):
         """
         Set this class with location of yaml config file and load it
         Args:
@@ -19,10 +23,17 @@ class ConfigYaml:
         """
         self._application_home = app_home
         self._file_path: str = f"{self._application_home}/conf/application.yaml"
+        #self._file_path = conf_dir.glob('application.yaml')
         self._config: Dict[str, Any] = {}
         
         # Automatic loading config
         self._load()
+
+        # Update EPY context 
+        # Get indirect context (to avoid circular error)
+        context = sys.modules.get("lib.bootstrap.context")
+        if context and hasattr(context, "context"):
+            context.context.CFGYAML_FILE = self._file_path
 
     #######################################
     ##### PUBLIC FONCTIONS & METHODES #####

@@ -1,37 +1,39 @@
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 import os
-import socket
+#import socket
+import platform
 from datetime import datetime
-from cfgproperties import ConfigProperties
-from cfgyaml import ConfigYaml
-from typing import Optional, Dict
+from typing import Optional
 
 class AppEnv:
     """
     A tool class to get simple information about environnement.
     """    
+    alias = "appenv"
 
-    def __init__(self, app_home: str, app_name: str):
-        """Constructor
-        Args:
-            app_home (str): Parent location for this app
-            app_name (str): Application name ("Default", by default)
+    #def __init__(self, app_home: str, app_name: str):
+    def __init__(self):
+
+        """
+        Constructor
         """
         
         # instance variables (hidden for more clarety in IDE)
-        self._application_home = app_home
-        self._application_name = app_name
+        # self._application_home = app_home
+        # self._application_name = app_name
         
-        # Loading config files (conf, yaml or properties)
-        self._config = ConfigProperties(self._application_home)
-        self._yaml = ConfigYaml(self._application_home)
+        
+        # # Loading config files (conf, yaml or properties)
+        # self._config = ConfigProperties(self._application_home)
+        # self._yaml = ConfigYaml(self._application_home)
+        # self.test = epy.cfg_yaml()
                 
-        # Getting env variables and display
-        env_config = self._setup_environment()
-        print(">> Configuration actuelle : <<")
-        for k, v in env_config.items():
-            print(f"{k}: {v}")
+        # # Getting env variables and display
+        # env_config = self._setup_environment()
+        # print(">> Configuration actuelle : <<")
+        # for k, v in env_config.items():
+        #     print(f"{k}: {v}")
 
 
     #####################################
@@ -41,27 +43,34 @@ class AppEnv:
     # @property => use @property for getting an object from constructor (self)
     # @staticmethod => use @property for getting an objecty from an imported lib. no instance needed
  
-    @property
-    def get_application_home(self) -> str:
-        """
-        Return parent location for this app
-        """
-        return self._application_home
+    # @property
+    # def get_application_home(self) -> str:
+    #     """
+    #     Return parent location for this app
+    #     """
+    #     return self._application_home
 
-    @property
-    def get_application_name(self) -> str:
+    # @property
+    # def get_application_name(self) -> str:
+    #     """
+    #     Return application name
+    #     """
+    #     return self._application_name
+
+    @staticmethod
+    def get_system() -> str:
         """
-        Return application name
+        Return type of system
         """
-        return self._application_name
-    
+        return f"{platform.system()} ({platform.platform()})"
 
     @staticmethod
     def get_hostname() -> str:
         """
-        Return host name
+        Return hostname
         """
-        return socket.gethostname()
+        #return socket.gethostname()
+        return platform.node()
     
     
     @staticmethod
@@ -175,30 +184,30 @@ class AppEnv:
     ##### PRIVATE METHOD & FUNCTIONS #####
     ######################################
 
-    def _setup_environment(self) -> Dict[str, str]:
-        """
-        Set project variables from environment variables or from file env.conf for executing project 
-        Args:
-            None
-        Return:
-            env_config (dict): dictionary of environment variables for current project
-        """
+    # def _setup_environment(self) -> Dict[str, str]:
+    #     """
+    #     Set project variables from environment variables or from file env.conf for executing project 
+    #     Args:
+    #         None
+    #     Return:
+    #         env_config (dict): dictionary of environment variables for current project
+    #     """
         
-        # Loading variables as environment variables (linked to current python context)
-        os.environ["APPLICATION_HOME"] = self._application_home
-        os.environ["APPLICATION_NAME"] = self._application_name
-        os.environ["PYTHONHOME"] = self._config.get_venv_python_home
-        os.environ["PYTHONPATH"] = self._config.get_parent_python_home
+    #     # Loading variables as environment variables (linked to current python context)
+    #     os.environ["APPLICATION_HOME"] = self._application_home
+    #     os.environ["APPLICATION_NAME"] = self._application_name
+    #     os.environ["PYTHONHOME"] = self._config.get_venv_python_home
+    #     os.environ["PYTHONPATH"] = self._config.get_parent_python_home
         
-        # store variables in a dict "env_config"
-        env_config = {
-            "APPLICATION_HOME": self._application_home,
-            "APPLICATION_NAME": self._application_name,
-            "PARENT_PYTHON_HOME": self._config.get_venv_python_home,
-            "PYTHON_HOME": self._config.get_venv_python_home,
-            "ENV_CONF": self._config.get_env_file,
-            "PROPERTIES_FILE": self._config.get_properties_file,
-            "YAML_FILE": self._yaml.get_yaml_file
-        }
-        return env_config
+    #     # store variables in a dict "env_config"
+    #     env_config = {
+    #         "APPLICATION_HOME": self._application_home,
+    #         "APPLICATION_NAME": self._application_name,
+    #         "PARENT_PYTHON_HOME": self._config.get_venv_python_home,
+    #         "PYTHON_HOME": self._config.get_venv_python_home,
+    #         "ENV_CONF": self._config.get_env_file,
+    #         "PROPERTIES_FILE": self._config.get_properties_file,
+    #         "YAML_FILE": self._yaml.get_yaml_file
+    #     }
+    #     return env_config
     

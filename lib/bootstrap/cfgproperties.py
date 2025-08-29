@@ -1,6 +1,6 @@
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
-import os
+import os, sys
 import re
 import subprocess
 from typing import Optional, Dict, Any
@@ -15,7 +15,8 @@ class ConfigProperties:
     - conf/env.conf : mainly storing python environment variables like python executer location
     - conf/application.properties : contains properties used par application 
     """
-    
+    alias = "cfgprops"
+
     def __init__(self, app_home: str):
         """
         Constructor.
@@ -35,6 +36,12 @@ class ConfigProperties:
         # Solve crossed references from env vars and config files
         self._resolve_all_placeholders()
 
+        # Update EPY context 
+        # Get indirect context (to avoid circular error)
+        context = sys.modules.get("lib.bootstrap.context")
+        if context and hasattr(context, "context"):
+            context.context.CFGENV_FILE = self._env_file
+            context.context.CFGPROPS_FILE = self._properties_file
 
     #######################################
     ##### PUBLIC FONCTIONS & METHODES #####

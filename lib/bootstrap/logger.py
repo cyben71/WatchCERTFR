@@ -1,13 +1,15 @@
-__version__ = "1.0.0"
+__version__ = "1.0.2"
 
 import os
-from appenv import AppEnv
+from lib.bootstrap.appenv import AppEnv
 from typing import Optional
 
 class Logger:
     """
     Class for handling actions in log files
     """
+    alias = "log"
+
     
     def __init__(self, app_home: str, app_name: str):
         """Constructor
@@ -17,7 +19,7 @@ class Logger:
         """
         self._application_home = app_home
         self._application_name = app_name
-       
+
         self._log_folder = f"{self._application_home}/log"
         self._log_file = f"{self._application_home}/log/{self._application_name}_{AppEnv.get_current_date()}.log"
     
@@ -39,6 +41,22 @@ class Logger:
         Return log file
         """
         return self._log_file
+    
+    def log(self, message: str) -> None:
+        """
+        Output a message in a log file without prefix and current date & timestamp
+        Args:
+            message (str): Message to output
+        Return:
+            None
+        """
+        # prefix = None
+        try:
+            self._log(msg=message)
+        except Exception as err:
+            raise err
+        print(f"{AppEnv.get_current_date()} {AppEnv.get_current_time()} - {message}")
+
     
     def info(self, message: str) -> None:
         """
@@ -117,7 +135,7 @@ class Logger:
             log_format = f"{AppEnv.get_current_date()} {AppEnv.get_current_time()} - {prefix} : {msg}"
     
         try:
-            with open(self._log_file, 'a') as file:
+            with open(self._log_file, 'a', encoding='utf-8') as file:
                 file.write(f"{log_format}\n")
         except Exception as err:
             print(f"!!! FAIL !!! {self._log_file} not updated")
