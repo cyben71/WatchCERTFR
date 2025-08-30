@@ -3,3 +3,4 @@
 
 ### project dependencies ###
 feedparser
+certifi

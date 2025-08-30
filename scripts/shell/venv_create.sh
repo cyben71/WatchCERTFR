@@ -93,12 +93,12 @@ source "${VENV_PYTHON_DIR}/bin/activate"
 
 # Pip updating
 log_message "🔄  Updating Pip..."
-${VENV_PYTHON_DIR}/bin/pip install --upgrade pip
+${VENV_PYTHON_DIR}/bin/pip3 install --upgrade pip
 
 # Installing Python packages
 if [ -f "${CONF_DIR}/requirements.txt" ]; then
     log_message "📦  Python dependencies installation..."
-    ${VENV_PYTHON_DIR}/bin/pip install -r "${CONF_DIR}/requirements.txt"
+    ${VENV_PYTHON_DIR}/bin/pip3 install -r "${CONF_DIR}/requirements.txt"
 else
     log_message "🟠  No requirement.txt file found"
     # ${VENV_PYTHON_DIR}/bin/pip install --user jupyter
