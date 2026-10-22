@@ -1,0 +1,20 @@
+2026-10-22 14:26:41 - ==========================================
+2026-10-22 14:26:41 - === Scan des avis & alertes du CERT-FR ===
+2026-10-22 14:26:41 - ==========================================
+2026-10-22 14:26:41 - INFO : Liste des programmes surveillés : ['linux', 'ubuntu', 'apple', 'sap', 'openssh', 'openssl', 'python', 'spark', 'prometheus', 'grafana']
+2026-10-22 14:26:41 - 
+2026-10-22 14:26:41 - INFO : Avis de sécurité: http://www.cert.ssi.gouv.fr/avis 
+2026-10-22 14:26:41 - Multiples vulnérabilités dans le noyau Linux d'Ubuntu (16 octobre 2026) - CERTFR-2026-AVI-1333 -  https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1333/
+2026-10-22 14:26:41 - Multiples vulnérabilités dans le noyau Linux de Red Hat (16 octobre 2026) - CERTFR-2026-AVI-1334 -  https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1334/
+2026-10-22 14:26:41 - Multiples vulnérabilités dans le noyau Linux de SUSE (16 octobre 2026) - CERTFR-2026-AVI-1335 -  https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1335/
+2026-10-22 14:26:41 - 
+2026-10-22 14:26:41 - INFO : Alerte de sécurité: https://www.cert.ssi.gouv.fr/alerte 
+2026-10-22 14:26:42 - Vulnérabilité dans Apple Mac OS X (24 juillet 2015) - CERTFR-2015-ALE-009 -  https://www.cert.ssi.gouv.fr/alerte/CERTFR-2015-ALE-009/
+2026-10-22 14:26:42 - Vulnérabilité dans OpenSSH (01 juillet 2024) - CERTFR-2024-ALE-009 -  https://www.cert.ssi.gouv.fr/alerte/CERTFR-2024-ALE-009/
+2026-10-22 14:26:42 - Vulnérabilité dans SAP NetWeaver (28 avril 2025) - CERTFR-2025-ALE-005 -  https://www.cert.ssi.gouv.fr/alerte/CERTFR-2025-ALE-005/
+2026-10-22 14:26:42 - 
+2026-10-22 14:26:42 - INFO : Menaces_incidents de sécurité: https://www.cert.ssi.gouv.fr/cti 
+2026-10-22 14:26:42 - Campagne de notifications de menace envoyée par Apple (11 septembre 2025) - CERTFR-2025-CTI-010 -  https://www.cert.ssi.gouv.fr/cti/CERTFR-2025-CTI-010/
+2026-10-22 14:26:42 - 
+2026-10-22 14:26:42 - === Fin du traitement ===
+2026-10-22 14:26:42 - 

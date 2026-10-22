@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# USAGES:
-# $ ./bin/notebook-converter.sh ${NOTEBOOK_NAME.ipynb}
+# description:  Convert a Jupyter notebook file to a Python program. Python program is automatically stored in 'app/' folder
+# version:      2.1.0
+# usage:		./scripts/shell/notebook-converter.sh ${NOTEBOOK_NAME.ipynb}
 
 set -e  # Stop the script on error
 
@@ -16,14 +17,13 @@ log_message() {
 ###############################
 # APPLICATION_HOME AND CONFIG #
 ###############################
-#APPLICATION_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 # starting point. current script is launched from this folder
 current_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# going up folders until we find init_code.py in lib/init/ folder
+# going up folders until we find bootstrap.py in lib/bootstrap/ directory
 while [ "$current_dir" != "/" ]; do
-    candidate="$current_dir/lib/init/init_code.py"
+    candidate="$current_dir/lib/bootstrap/bootstrap.py"
     if [ -f "$candidate" ]; then
         export APPLICATION_HOME="$current_dir"
         echo "APPLICATION_HOME: $APPLICATION_HOME"
@@ -34,7 +34,7 @@ done
 
 # Checking
 if [ -z "${APPLICATION_HOME:-}" ]; then
-    echo "❌  Error : Fail to find init_code.py"
+    echo "❌  Error : Fail to find bootstrap.py"
     exit 1
 fi
 
@@ -42,33 +42,59 @@ CONF_DIR="${APPLICATION_HOME}/conf"
 SRC_DIR="${APPLICATION_HOME}/notebooks"
 APP_DIR="${APPLICATION_HOME}/app"
 
-# Logs
-LOG_FILE="${APPLICATION_HOME}/log/convert.log"
+# Setting logging folder and file
+CURRENT_DATE="$(date '+%Y-%m-%d')"
+LOG_FILE="${APPLICATION_HOME}/log/convert_${CURRENT_DATE}.log"
 mkdir -p "$(dirname "${LOG_FILE}")"
+
+# ------------------------------------------------------------------------ #
+
+log_message "# ============================ #"
+log_message "# === CONVERTING NOTEBOOK ==== #"
+log_message "# ============================ #"
+log_message ""
 
 # Chargement env.conf
 if [ -f ${CONF_DIR}/env.conf ]; then
     . ${CONF_DIR}/env.conf
 else
-    log_message "❌ Error : Config file '${CONF_DIR}/env.conf' not found."
+    log_message "❌  Error : Config file '${CONF_DIR}/env.conf' not found."
     exit 1
 fi
 
-###############################
+# Set Virtual Python env variables
+VENV_PYTHON_DIR="${APPLICATION_HOME}/rt"
+VENV_PYTHON_EXE="${PARENT_PYTHON_EXE}"
+
+# Display variables
+log_message "PARENT_PYTHON_HOME : ${PARENT_PYTHON_HOME}"
+log_message "PARENT_PYTHON_EXE : ${PARENT_PYTHON_EXE}"
+log_message "VENV_PYTHON_DIR : ${VENV_PYTHON_DIR}"
+log_message "VENV_PYTHON_EXE : ${PARENT_PYTHON_EXE}"
+
+# ======================================================================== #
+# ======================================================================== #
+
+log_message ""
+log_message "-----------------------------------------------------"
+log_message "--- Converting Jupyter notebook to Python program ---"
+log_message "-----------------------------------------------------"
+log_message ""
 
 # Search for Python exec
 if [ -d "${VENV_PYTHON_DIR}" ] && [ -x "${VENV_PYTHON_DIR}/bin/${VENV_PYTHON_EXE}" ]; then
     VENV_PYTHON="${VENV_PYTHON_DIR}/bin/${VENV_PYTHON_EXE}"
-    log_message "🟢 Virtual environment found. Using : ${VENV_PYTHON}"
+    log_message "🟢  Virtual environment found. Using : ${VENV_PYTHON}"
     PYTHON_EXE="${VENV_PYTHON}"
 else
-    log_message "⚪️ No virtual environment found. Using : ${PARENT_PYTHON_HOME}/bin/${PARENT_PYTHON_EXE}"
+    log_message "⚪️  No virtual environment found. Using : ${PARENT_PYTHON_HOME}/bin/${PARENT_PYTHON_EXE}"
     PYTHON_EXE="${PARENT_PYTHON_HOME}/bin/${PARENT_PYTHON_EXE}"
 fi
+log_message ""
 
 # Checking argument for execution
 if [ -z "$1" ]; then
-    log_message "❌ Error : You have to provide a program name for launching."
+    log_message "❌  Error : You have to provide a program name for launching."
     log_message "Using : $0 <nom_du_python.py>"
     exit 1
 fi
@@ -78,8 +104,18 @@ NOTEBOOK_PATH="${SRC_DIR}/${NOTEBOOK_NAME}"
 
 # Checking notebook exists
 if [ ! -f "${NOTEBOOK_PATH}" ]; then
-    log_message "❌ Error : Notebook '${NOTEBOOK_NAME}' is not found in '${SRC_DIR}'."
+    log_message "❌  Error : Notebook '${NOTEBOOK_NAME}' is not found in '${SRC_DIR}'."
     exit 1
+fi
+
+# Checking Jupyter package exists
+# if ! jupyter --version &> /dev/null; then
+if ! ${PYTHON_EXE} -m jupyter --version &> /dev/null; then
+    log_message "❌  Error : Jupyter package is not available"
+    exit 1
+else
+    log_message "✅  Jupyter package is available"
+    log_message ""
 fi
 
 # Converting from notebook to python program
@@ -88,10 +124,14 @@ ${PYTHON_EXE} -m jupyter nbconvert --to script "${NOTEBOOK_PATH}" --output-dir="
 
 # Checking converting
 if [ $? -eq 0 ]; then
-    log_message "✅ Success : ${NOTEBOOK_NAME}"
+    log_message "✅  Notebook ${NOTEBOOK_NAME} successfully converted"
+    #log_message ""
+    log_message "🎉  File available: ${APP_DIR}/${NOTEBOOK_NAME%.*}.py"
 else
-    log_message "❌ Fail : ${NOTEBOOK_NAME}"
+    log_message "❌  Fail to convert ${NOTEBOOK_NAME}"
     exit 1
 fi
-log_message "🎉 Converting is finished."
-log_message "--- END OF PROCESS ---"
+
+log_message ""
+log_message "# === END OF PROCESS === #"
+log_message ""
