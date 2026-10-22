@@ -1,10 +1,11 @@
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 
 import logging
 import os
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from lib.bootstrap.appenv import AppEnv
+# from lib.bootstrap.appenv import AppEnv
+from lib.bootstrap.calendar import Calendar
 from typing import Optional
 
 
@@ -42,7 +43,7 @@ class Logger:
         self._verbose = verbose
 
         self._log_folder = Path(app_home) / "log"
-        self._log_file = self._log_folder / f"{app_name}_{AppEnv.get_current_date()}.log"
+        self._log_file = self._log_folder / f"{app_name}_{Calendar.get_current_date()}.log"
 
         self._logger = self._setup_logger(max_bytes, backup_count)
 

@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[5]:
+# In[1]:
 
 
 APPLICATION_NAME = "surveillance_certfr"
 
 
-# In[6]:
+# In[ ]:
 
 
 import sys
@@ -32,7 +32,7 @@ from lib.bootstrap.bootstrap import init_env
 epy = init_env()
 
 
-# In[7]:
+# In[3]:
 
 
 # import
@@ -41,7 +41,7 @@ import os
 import certifi
 
 
-# In[8]:
+# In[4]:
 
 
 # variables
@@ -57,7 +57,7 @@ email_on: bool = yml.get("email.enable")
 # print(email_on)
 
 
-# In[9]:
+# In[5]:
 
 
 if email_on: 
@@ -74,7 +74,7 @@ else:
 
 # ## Traitement
 
-# In[10]:
+# In[6]:
 
 
 log.log("==========================================")
@@ -86,7 +86,7 @@ log.log("")
 
 # ### Recherche des alertes et avis CERTFR
 
-# In[11]:
+# In[7]:
 
 
 # Force Python à utiliser le fichier de certificats de certifi pour éviter une erreur de type
@@ -94,7 +94,7 @@ log.log("")
 os.environ['SSL_CERT_FILE'] = certifi.where()
 
 
-# In[12]:
+# In[8]:
 
 
 flag_email: bool = False
@@ -124,7 +124,7 @@ for feed in yml.get("feed"):
 
 
 
-# In[13]:
+# In[9]:
 
 
 log.log("=== Fin du traitement ===")
@@ -133,7 +133,7 @@ log.log("")
 
 # ### Alerting par email
 
-# In[14]:
+# In[ ]:
 
 
 if flag_email and email_on:
@@ -152,7 +152,7 @@ if flag_email and email_on:
     # attaching different parts to email container like subject and others.
     message = MIMEMultipart()
     message['Subject'] = yml.get('email.subject')
-    message['From'] = yml.get('smtp.user')
+    message['From'] = yml.get('email.from')
     message['To'] = COMMASPACE.join(recipient_email)
     message["Date"] = formatdate(localtime=True)
     body_part = MIMEText(yml.get('email.body'))
@@ -173,7 +173,6 @@ if flag_email and email_on:
             server.sendmail(sender_email, recipient_email, message.as_string())
     except Exception as err:
         log.error(f"Echec d'envoi d'email")
-
-    ## DEBUG
-    # print(message)
+        # DEBUG
+        # print(message)
 

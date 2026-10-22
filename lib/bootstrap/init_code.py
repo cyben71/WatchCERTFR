@@ -1,4 +1,4 @@
-__version__ = "1.0.4"
+__version__ = "1.1.0"
 
 import importlib.util
 import inspect
@@ -6,13 +6,16 @@ import platform
 import sys
 import os
 from pathlib import Path
+from typing import Any, List, Type, TypeVar, overload
 from lib.bootstrap.context import context, Context
 from lib.bootstrap import cfgyaml
 from lib.bootstrap import cfgproperties
 from lib.bootstrap import logger
 from lib.bootstrap import appenv
 from lib.bootstrap import docgenerator
-# from lib.bootstrap import envloader
+from lib.bootstrap import calendar
+
+T = TypeVar('T')
 
 def init() -> None:
 
@@ -23,6 +26,7 @@ def init() -> None:
     
     # load and instanciate classes in context
     context.appenv = appenv.AppEnv()
+    context.calendar = calendar.Calendar()
     context.cfgyaml = cfgyaml.ConfigYaml(app_home=context.APPLICATION_HOME)
     context.cfgprops = cfgproperties.ConfigProperties(app_home=context.APPLICATION_HOME)
 
@@ -82,8 +86,15 @@ def load_epy_cls(epy: Context, app_home: Path , app_name: str) -> None:
         except Exception as e:
             print(f"[load_epy_cls] - Error on instanciating of {cls.__name__}: {e}")
 
+@overload
+def load_class(module_name: str, class_name: str = "", args: List[Any] = [], *, cls_type: Type[T]) -> T: 
+    ...
 
-def load_class(module_name: str, class_name: str = None, args: list = []):
+@overload
+def load_class(module_name: str, class_name: str = "", args: List[Any] = [], *, cls_type: None = None) -> Any:
+    ...
+
+def load_class(module_name: str, class_name: str = "", args: List[Any] = [], *, cls_type: Type[T] | None = None) -> T | Any:
     """
     Allow to load and instanciate your own python class (outside of lib/bootstrap).
 
@@ -91,6 +102,7 @@ def load_class(module_name: str, class_name: str = None, args: list = []):
         module_name (str): Module name (without extension) to load. Ex: module_name = 'my_dummy_class'
         class_name (str, optional): Class name to load. Defaults to None.
         args (list, optional): List of arguments required by module. Defaults to [].
+        cls_type (Type[T], optional): Expected class type for static analysis. Defaults to None.
 
     Returns:
         cls (object): a properly loaded module with its class.
@@ -99,7 +111,7 @@ def load_class(module_name: str, class_name: str = None, args: list = []):
     #     raise ValueError("Au moins 'module_name' ou 'class_name' doit être fourni.")
 
     # Add lib to python context if not exists
-    lib_path = Path(context.APPLICATION_HOME) / "lib"
+    lib_path: str = str(Path(context.APPLICATION_HOME) / "lib")
     if lib_path not in sys.path:
         sys.path.insert(0, lib_path)
 
@@ -118,12 +130,12 @@ def load_class(module_name: str, class_name: str = None, args: list = []):
         raise ImportError(f"Module '{module_name}' can not be loaded - {e}")
 
     # Looking for class
-    if class_name:
+    if class_name != "":
         cls = getattr(mod, class_name, None)
         if cls is None:
             raise AttributeError(f"Class '{class_name}' is not found in '{module_name}' module")
     else:
-        classes = [obj for name, obj in inspect.getmembers(mod, inspect.isclass) if obj.__module__ == mod.__name__]
+        classes = [obj for _, obj in inspect.getmembers(mod, inspect.isclass) if obj.__module__ == mod.__name__]
         if len(classes) == 1:
             cls = classes[0]
         elif len(classes) == 0:
@@ -149,11 +161,16 @@ def summarize_context() -> None:
 
     def color(text: str, code: str) -> str:
         return f"\033[{code}m{text}\033[0m" if supports_color() else text
+    
 
     python_version = platform.python_version()
     interpreter_path = sys.executable
     is_venv = sys.prefix != sys.base_prefix
     venv_info = "✅ Virtualenv actif" if is_venv else "❌ Pas de virtualenv"
+
+    # .env file info, formatted like ENVIRONMENT (✅/❌ + location)
+    dotenv_path = getattr(context, "appenv", None) and context.appenv.dotenv_path
+    dotenv_info = f"{dotenv_path}" if dotenv_path else "❌ Aucun fichier .env trouvé"
 
     # Modules dynamically loaded in context
     module_names = [
@@ -177,13 +194,16 @@ def summarize_context() -> None:
     print(f"{color('📁  APPLICATION_HOME', '93')} : {context.APPLICATION_HOME}")
     print(f"{color('📛  APPLICATION_NAME', '93')} : {context.APPLICATION_NAME}")
 
-    # Config files dynamically loaded in context
+    # Config files dynamically loaded in context (properties, yaml, env et .env)
     if hasattr(context, 'CFGENV_FILE'):
         print(f"📘  ENV file loaded : {context.CFGENV_FILE}")
     if hasattr(context, 'CFGPROPS_FILE'):
         print(f"📘  PROPERTIES file loaded : {context.CFGPROPS_FILE}")
     if hasattr(context, 'CFGYAML_FILE'):
         print(f"📘  YAML file loaded : {context.CFGYAML_FILE}")
+    if hasattr(context, 'CFGENV_FILE'):
+        print(f"📘  DOTENV file loaded : {dotenv_info}")
+    
     # show vars env list
     #if hasattr(context, 'envloader'):
     #    context.envloader.summarize()
@@ -191,3 +211,4 @@ def summarize_context() -> None:
     print()
     print(color("✅  Context is ready.", "92"))  # vert
     print(color(separator, "90"))
+
