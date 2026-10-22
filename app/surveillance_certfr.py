@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[5]:
 
 
 APPLICATION_NAME = "surveillance_certfr"
 
 
-# In[ ]:
+# In[6]:
 
 
 import sys
@@ -32,7 +32,7 @@ from lib.bootstrap.bootstrap import init_env
 epy = init_env()
 
 
-# In[ ]:
+# In[7]:
 
 
 # import
@@ -41,7 +41,7 @@ import os
 import certifi
 
 
-# In[ ]:
+# In[8]:
 
 
 # variables
@@ -54,10 +54,10 @@ excluding = yml.get("exclude")
 # print(excluding)
 
 email_on: bool = yml.get("email.enable")
-print(email_on)
+# print(email_on)
 
 
-# In[ ]:
+# In[9]:
 
 
 if email_on: 
@@ -68,12 +68,13 @@ if email_on:
     from email.utils import COMMASPACE
     from email.utils import formatdate
 else:
-    print("Sending email alert is OFF")
+    log.warning("Sending email alert is OFF")
+    log.log("")
 
 
 # ## Traitement
 
-# In[ ]:
+# In[10]:
 
 
 log.log("==========================================")
@@ -85,7 +86,7 @@ log.log("")
 
 # ### Recherche des alertes et avis CERTFR
 
-# In[ ]:
+# In[11]:
 
 
 # Force Python à utiliser le fichier de certificats de certifi pour éviter une erreur de type
@@ -93,7 +94,7 @@ log.log("")
 os.environ['SSL_CERT_FILE'] = certifi.where()
 
 
-# In[ ]:
+# In[12]:
 
 
 flag_email: bool = False
@@ -123,7 +124,7 @@ for feed in yml.get("feed"):
 
 
 
-# In[ ]:
+# In[13]:
 
 
 log.log("=== Fin du traitement ===")
@@ -132,7 +133,7 @@ log.log("")
 
 # ### Alerting par email
 
-# In[ ]:
+# In[14]:
 
 
 if flag_email and email_on:
@@ -143,8 +144,8 @@ if flag_email and email_on:
     recipient_email = yml.get('email.to')
 
 
-    log_file: str = log.get_log_file
-    log_filename: str = os.path.basename(epy.log.get_log_file)
+    log_file: str = log.log_file
+    log_filename: str = os.path.basename(epy.log.log_file)
 
     # MIMEMultipart() creates a container for an email message that can hold
     # different parts, like text and attachments and in next line we are
@@ -164,7 +165,7 @@ if flag_email and email_on:
         with open(log_file,'rb') as file:
             message.attach(MIMEApplication(file.read(), Name=log_filename))
 
-        # secction 2 for sending email
+        # section 2 for sending email
         with smtplib.SMTP(smtp_server, smtp_port) as server:
             if yml.get('smtp.isTls'):
                 server.starttls()
@@ -174,5 +175,5 @@ if flag_email and email_on:
         log.error(f"Echec d'envoi d'email")
 
     ## DEBUG
-    print(message)    
+    # print(message)
 
