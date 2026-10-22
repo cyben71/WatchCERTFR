@@ -4,24 +4,27 @@ feed:
   url: http://www.cert.ssi.gouv.fr/avis
 - name: alerte
   url: https://www.cert.ssi.gouv.fr/alerte
+- name: menaces_incidents
+  url: https://www.cert.ssi.gouv.fr/cti
 
 # watch CERT-FR alerts for these programs
-watch_list: [ubuntu, sap, openssh, openssl, edge]
+watch_list: [linux, ubuntu, apple, sap, openssh, openssl, python, spark, prometheus, grafana]
 
-# excluded alerts and notices (already fixed or without impact for Datakkod)
-exclude: [CERTFR-2022-ALE-014, CERTFR-2023-ALE-002]
+# excluded alerts and notices (already fixed or without impact)
+exclude: [CERTFR-2024-ALE-009]
 
 # smtp settings
 smtp:
-    host: 'smtp.gmail.com'
-    port: 587
-    user: 'login_gmail'
-    password: 'xxx'
+    host: "${SMTP_HOST}"
+    port: "${SMTP_PORT}"
+    user: "${SMTP_USER}"
+    password: "${SMTP_PWD}"
     isTls: True
 
 # Alert email
 email:
-    from: 'adresse_expediteur'
-    to: ['cyben71 <adresse_destinataire>', other-man <adresse_destinataire_2>]
-    subject: "[CERTFR] - Surveillance des avis et alertes"
-    body: "Ceci est le résultat du dernier scan des flux RSS du CertFR. Vérifier les avis et alertes en pièces jointe."
+    enable: False
+    from: 'email@smtphost.dom'
+    to: ['destinataire_1@email.dom']
+    subject: "Les dernières publications du CERTFR"
+    body: "Voici les dernières publications (avis, alerte et menaces) publiées par le CERTFR"

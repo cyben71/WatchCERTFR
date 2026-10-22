@@ -1,4 +1,4 @@
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 import os, sys
 import yaml
@@ -7,7 +7,7 @@ from typing import Dict, List, Any, Optional
 
 class ConfigYaml:
     """
-    Class for handling config files application.yaml
+    Class for handling config files application.yaml.
 
     Config files used by this class: 
     - conf/application.yaml : contains properties used by application
@@ -15,15 +15,14 @@ class ConfigYaml:
     alias = "cfgyaml"
 
     def __init__(self, app_home: str):
-    #def __init__(self, conf_dir: Path):
         """
-        Set this class with location of yaml config file and load it
+        Set this class with location of yaml config file and load it.
+
         Args:
             app_home (str): Parent location for this app
         """
         self._application_home = app_home
         self._file_path: str = f"{self._application_home}/conf/application.yaml"
-        #self._file_path = conf_dir.glob('application.yaml')
         self._config: Dict[str, Any] = {}
         
         # Automatic loading config
@@ -42,7 +41,7 @@ class ConfigYaml:
     @property
     def get_yaml_file(self):
         """
-        Return application.yaml location
+        Return application.yaml location.
         """
         return self._file_path
 
@@ -52,15 +51,18 @@ class ConfigYaml:
             strip_values: Optional[bool] = None
             ) -> Any:
         """
-        Get value from a specified key coming from a yaml file. Can handled 
+        Get value from a specified key coming from a yaml file. 
+        Can handled: 
         - imbricated path (ex: customer.given)
         - string stripping
+
         Args:
             key (str): Path of key to look for (ex: 'customer.given')
             default (str, optional): Default value if key is not found (by default = None)
             root (dict, optional): Data root for internal solving (by default: self._config)
             strip_values (bool, optional): Enabling string stripping (True by default)
-        Return: 
+
+        Returns: 
             Associated value from a key
         """
         if root is None:
@@ -76,8 +78,6 @@ class ConfigYaml:
             for k in keys:
                 value = value[k]    # get nested key
 
-            # enabling stripping
-            #return self._strip_value(value) if strip_values else value
             if strip_values:
                 return self._strip_value(value)
             else:
@@ -93,44 +93,57 @@ class ConfigYaml:
     def _strip_value(self, value: Any) -> Any:
         """
         Deleting empty caracters from a value. 
-        Value can be string, List, Dict so function can be called recursively
+        Value can be string, List, Dict so function can be called recursively.
+
         Args:
             value (Any): value to strip
+            
         Returns:
             str: Stripped value
         """
         if isinstance(value, str):
             return value.strip()
         elif isinstance(value, Dict):
-            # use recursive call for all dictionary values
             values: Any = value.items()
             return {k: self._strip_value(v) for k, v in values}
         elif isinstance(value, List):
-            # use recursive call for all list values
             values: Any = value
             return [self._strip_value(item) for item in values]
         return value
 
     def _resolve_env_vars(self, value: Any) -> Any:
         """
-        Replacing placeholders ${VARIABLES} found in a value by its real value coming from OS env. variables
+        Replacing placeholders ${VARIABLES} found in a value by its real value coming from OS env. variables.
+        Handles nested structures: recursively processes dict and list values.
+
         Args:
             value (Any): Value which can contain placeholders in format ${VARIABLES}.
+                         Can be a str, dict, list, or any other type.
+
         Returns:
-            str: Final value with solved OS env. variable
+            Any: Final value with solved OS env. variables, preserving the original structure.
         """
         if isinstance(value, str):
-            resolved = re.sub(r"\$\{(\w+)\}", lambda match: os.getenv(match.group(1), match.group(0)), value)
-            return resolved
+            return re.sub(
+                r"\$\{(\w+)\}",
+                lambda match: os.getenv(match.group(1), match.group(0)),
+                value
+            )
+        elif isinstance(value, dict):
+            return {k: self._resolve_env_vars(v) for k, v in value.items()}
+        elif isinstance(value, list):
+            return [self._resolve_env_vars(item) for item in value]
         return value
 
     def _resolve_nested_vars(self, data: Any, root: Optional[Any]=None) -> Any:
         """
-        Solving internal references from yaml file like ${customer.given}
+        Solving internal references from yaml file like ${customer.given}.
+
         Args:
             data (Any): load yaml data
             root (Any, optional): Reference to data root (by default: itself) 
-        Return: 
+            
+        Returns: 
             data (Any): value with solved internal references
         """
         if root is None:
@@ -161,11 +174,9 @@ class ConfigYaml:
             # raw loading yaml file 
             raw_config = yaml.safe_load(file)
             
-            # Replacing OS env. variables found in raw_config
-            resolved_config = self._resolve_nested_vars(
-                {k: self._resolve_env_vars(v) for k, v in raw_config.items()}
-            )
+            # Replacing OS env. variables found in raw_config (all levels, recursively)
+            resolved_config = self._resolve_env_vars(raw_config)
 
             # solving internal references
             self._config = self._resolve_nested_vars(resolved_config)
-
+            

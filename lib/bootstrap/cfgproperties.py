@@ -1,4 +1,4 @@
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 import os, sys
 import re
@@ -7,19 +7,20 @@ from typing import Optional, Dict, Any
 
 class ConfigProperties:
     """
-    Class for handling config files application.properties and env.conf
-    Allow to load config files, replace placeholders behind ${VAR} by OS env vars values or from other config keys included in config files
-    A recurse method is set to solve all crossed references from ${VAR}
+    Class for handling config files application.properties and env.conf.
+    Allow to load config files, replace placeholders behind ${VAR} by OS env vars values or from other config keys included in config files.
+    A recurse method is set to solve all crossed references from ${VAR}.
     
     Config files used by this class: 
-    - conf/env.conf : mainly storing python environment variables like python executer location
-    - conf/application.properties : contains properties used par application 
+    - conf/env.conf : mainly storing python environment variables like python executer location.
+    - conf/application.properties : contains properties used par application.
     """
     alias = "cfgprops"
 
     def __init__(self, app_home: str):
         """
         Constructor.
+
         Args:
             app_home (str): Parent location for this app
         """
@@ -29,7 +30,6 @@ class ConfigProperties:
         self._properties_file = os.path.join(self._application_home, "conf", "application.properties")
         self._env_file = os.path.join(self._application_home, "conf", "env.conf")
         
-        self._load_env_from_session()           # Loading current OS env vars
         self._load_file(self._env_file)         # Loading and store variables from env.conf
         self._load_file(self._properties_file)  # Loading and store variables from application.properties.
         
@@ -50,41 +50,43 @@ class ConfigProperties:
     @property
     def get_env_file(self) -> str:
         """      
-        Return location for config file: env.conf
+        Return location for config file: env.conf.
         """
         return self._env_file
     
     @property
     def get_properties_file(self) -> str:
         """
-        Return location for config file: application.properties
+        Return location for config file: application.properties.
         """
         return self._properties_file
     
     @property
     def get_parent_python_home(self) -> str:
         """
-        Return location for parent python
+        Return location for parent python.
         """
         return self.get("PARENT_PYTHON_HOME")
     
     @property
     def get_venv_python_home(self) -> str:
         """
-        Return location for python virtual environment 
+        Return location for python virtual environment.
         """
         return self.get("VENV_PYTHON_DIR")
     
     
     def get(self, key: str, default: Optional[str] = None, strip_values: bool = True) -> Any:
         """
-        Getting value from a specified key with handling of environment variables and empty string stripping
+        Getting value from a specified key with handling of environment variables and empty string stripping.
+
         Args:
             key (str): Key to find in current config context
             default (str, optionnal): Default string to return if searched key is not found
             strip_values (bool, optionnal): Enabling string stripping (True by default)
+
         Returns:
-            str: Value associated to searched key. Default value if key is not found
+            str: Value associated to searched key. Default value if key is not found.
         """
         value: Any = self._config.get(key, default)
 
@@ -102,9 +104,11 @@ class ConfigProperties:
 
     def _load_file(self, file_path: str) -> None:
         """
-        Loading a config file (.properties or .conf). keys-values are stored in a hidden object "_config"
+        Loading a config file (.properties or .conf). 
+        keys-values are stored in a hidden object "_config".
+
         Args:
-            file_path (str): Location of config file to load
+            file_path (str): Location of config file to load.
         """
         if not os.path.isfile(file_path):
             raise FileNotFoundError(f"Configuration file '{file_path}' is not found")
@@ -122,8 +126,8 @@ class ConfigProperties:
 
     def _resolve_all_placeholders(self) -> None:
         """
-        Recurse solving all crossed references between config keys
-        This method is looking for all values stored in _config object and replace placeholders (${VAR}) by value from config until all values are set 
+        Recurse solving all crossed references between config keys.
+        This method is looking for all values stored in _config object and replace placeholders (${VAR}) by value from config until all values are set.
         """
         unresolved = True
         while unresolved:
@@ -136,11 +140,13 @@ class ConfigProperties:
 
     def _resolve_env_vars(self, value: Any) -> Any:
         """
-        Replacing placeholders ${VAR} found in a string by its value from  _config
+        Replacing placeholders ${VAR} found in a string by its value from  _config.
+
         Args:
             value (str): String which can contain placeholders in format ${VAR}.
+
         Returns:
-            str: String with solved value of environment variables
+            str: String with solved value of environment variables.
         """
         if isinstance(value, str):
             return re.sub(r"\$\{(\w+)\}", lambda match: os.getenv(match.group(1), match.group(0)), value)
@@ -148,24 +154,15 @@ class ConfigProperties:
 
     def _strip_value(self, value: Any) -> Any:
         """
-        Deleting empty caracters from a string
+        Deleting empty caracters from a string.
+
         Args:
-            value (Any): String to strip
+            value (Any): String to strip.
+
         Returns:
-            str: Stripped value
+            str: Stripped value.
         """
         if isinstance(value, str):
             return value.strip()
         else:
             return value
-
-    def _load_env_from_session(self) -> None:
-        """
-        Loading all OS environment variables from current session
-        This method use "env" and "set" command to get OS env. variables (from Linux and Windows) and set Python os.environ
-        """
-        cmd = "env" if os.name != "net" else "set"
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-        for line in result.stdout.splitlines():
-            key, _, value = line.partition("=")
-            os.environ[key] = value

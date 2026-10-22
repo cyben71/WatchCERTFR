@@ -11,10 +11,11 @@ epy: Context = context
 
 def init_env() -> Context:
     """
-    Wrapping function to init application environment with classes from EssencePy. Bootstrap will be launched and return EPY context
+    Wrapping function to init application environment with classes from EssencePy. 
+    Bootstrap will be launched and return EPY context.
 
     Returns:
-        Context: Including global vars like APP_HOME/APP_NAME and EssencePy Classes
+        Context: Including global vars like APP_HOME/APP_NAME and EssencePy Classes.
     """
     bootstrap()
     init_code.summarize_context()
@@ -23,7 +24,7 @@ def init_env() -> Context:
 
 def bootstrap() -> Context:
     """
-    Bootstrap function used to set EssencePy context called "epy"
+    Bootstrap function used to set EssencePy context called "epy".
 
     Returns:
         epy (Context): EssencePy context
@@ -62,10 +63,13 @@ def bootstrap() -> Context:
 def _find_application_home(sentinel: str = "lib/bootstrap/bootstrap.py") -> Path:
     """
     Founding and setting APPLICATION_HOME function.
+
     Args:
         sentinel (str, optional): Sentinel file used to set APPLICATION_HOME. Defaults to "lib/bootstrap/bootstrap.py".
+
     Raises:
-        FileNotFoundError: Exit if sentinel file is not found
+        FileNotFoundError: Exit if sentinel file is not found.
+        
     Returns:
         current (Path): Path of APPLICATION_HOME
     """
@@ -80,9 +84,10 @@ def _find_application_home(sentinel: str = "lib/bootstrap/bootstrap.py") -> Path
 
 def _find_application_name() -> str:
     """
-    Founding and setting APPLICATION_NAME
+    Founding and setting APPLICATION_NAME.
+
     Returns:
-        app_name (str): APPLICATION_NAME. Default to "Default"
+        app_name (str): APPLICATION_NAME. Default to "Default".
     """
     # 0. Default value
     app_name: str = "Default"

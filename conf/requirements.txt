@@ -1,5 +1,6 @@
-#jupyter     # need for converting jupyter noteboook to python program and run notebooks
-#pyyaml      # need for reading application.yaml file
+#jupyter==1.1.1              # need for converting jupyter noteboook to python program and run notebooks
+pyyaml==6.0.3               # need for reading application.yaml file
+python-dotenv==1.2.2        # need for using .env file in project
 
 ### project dependencies ###
 feedparser

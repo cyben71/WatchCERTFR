@@ -107,7 +107,6 @@ if [ -f "${CONF_DIR}/requirements.txt" ]; then
     ${PYTHON_FOLDER}/bin/pip3 install ${PIP_OPTS} -r "${CONF_DIR}/requirements.txt"
 else
     log_message "🟠  No requirement.txt file found"
-    # ${VENV_PYTHON_DIR}/bin/pip install --user jupyter
 fi
 
 # Checking installation
